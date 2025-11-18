@@ -415,7 +415,7 @@
     const saveApiBtn = document.getElementById("saveApiBtn");
 
     (function initApi() {
-      const savedBase = window.localStorage.getItem("pai6_api_base");
+      const savedBase = window.localStorage.getItem("pai6_api_base") || "https://chat-final-q8mj.onrender.com";
       const savedAdmin = window.localStorage.getItem("pai6_admin_key");
       if (savedBase) {
         state.apiBase = savedBase;

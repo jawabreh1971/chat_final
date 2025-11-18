@@ -19,6 +19,7 @@ app = FastAPI(title="PAI6 Backend")
 origins = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://pai6-frontend.onrender.com", 
 ]
 app.add_middleware(
     CORSMiddleware,
