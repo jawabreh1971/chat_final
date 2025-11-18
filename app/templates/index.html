@@ -1,0 +1,797 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>لوحة pai6 السيادية – FULL v4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #111827;
+      background: radial-gradient(circle at top left,#22c55e33,transparent 55%),
+                  radial-gradient(circle at top right,#3b82f633,transparent 55%),
+                  #020617;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header .title { display:flex; flex-direction:column; gap:.1rem; }
+    header h1 { margin:0; font-size:1.1rem; letter-spacing:.05em; }
+    header span { font-size:.8rem; color:#9ca3af; }
+    .api-config {
+      display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; justify-content:flex-end;
+    }
+    .api-config input {
+      min-width:260px; padding:.4rem .6rem; border-radius:999px;
+      border:1px solid #1f2937; background:#020617; color:#e5e7eb; font-size:.8rem; outline:none;
+    }
+    .api-config button {
+      padding:.4rem .85rem; border-radius:999px; border:none;
+      background:linear-gradient(135deg,#22c55e,#3b82f6); color:white;
+      cursor:pointer; font-size:.8rem; font-weight:600; box-shadow:0 0 10px #22c55e55;
+    }
+    .api-config button:disabled { opacity:.6; box-shadow:none; cursor:default; }
+    .api-status { font-size:.7rem; color:#9ca3af; margin-top:.1rem; }
+    main { flex:1; padding:.75rem; display:flex; justify-content:center; align-items:stretch; }
+    .shell {
+      width:100%; max-width:1180px;
+      background:radial-gradient(circle at top,#0b1120,#020617);
+      border-radius:1.25rem; border:1px solid #111827;
+      display:flex; flex-direction:column; overflow:hidden;
+      box-shadow:0 26px 80px rgba(0,0,0,.65); min-height:72vh;
+    }
+    .shell-header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.5rem 1rem; border-bottom:1px solid #020617;
+      background:linear-gradient(to right,#020617,#020617,#030712);
+    }
+    .dots{display:flex; gap:.3rem;}
+    .dot{width:10px; height:10px; border-radius:999px;}
+    .dot.red{background:#f97373;} .dot.yellow{background:#facc15;} .dot.green{background:#22c55e;}
+    .shell-title{font-size:.8rem; color:#9ca3af;}
+    .shell-badge{
+      font-size:.7rem; padding:.15rem .6rem; border-radius:999px;
+      border:1px solid #1f2937; color:#9ca3af;
+    }
+    .body{display:flex; flex:1; min-height:0;}
+    nav{
+      width:230px; border-inline-end:1px solid #020617;
+      background:linear-gradient(to bottom,#020617,#020617,#030712);
+      padding:.75rem .6rem .75rem .85rem;
+      display:flex; flex-direction:column; gap:.45rem;
+    }
+    nav h2{margin:0 0 .45rem; font-size:.8rem; color:#6b7280; padding-inline:.25rem;}
+    .nav-btn{
+      border-radius:.7rem; border:1px solid transparent;
+      padding:.45rem .55rem; font-size:.78rem;
+      display:flex; align-items:center; gap:.4rem;
+      background:transparent; color:#9ca3af; cursor:pointer; text-align:right;
+    }
+    .nav-btn span.icon{font-size:.9rem;}
+    .nav-btn small{display:block; font-size:.65rem; color:#6b7280;}
+    .nav-btn.active{
+      background:radial-gradient(circle at right,#22c55e33,transparent 60%);
+      border-color:#16a34a66; color:#e5e7eb;
+    }
+    .nav-footer{margin-top:auto; font-size:.7rem; color:#4b5563; padding:.4rem .25rem 0 .25rem;}
+    .content{
+      flex:1; padding:.75rem .75rem .75rem .65rem;
+      display:flex; flex-direction:column; gap:.7rem; min-width:0;
+    }
+    .panel-title{
+      display:flex; justify-content:space-between; gap:.4rem;
+      align-items:center; font-size:.8rem; color:#9ca3af; flex-wrap:wrap;
+    }
+    .panel-title h3{margin:0; font-size:.9rem; color:#e5e7eb;}
+    .badge-soft{
+      font-size:.7rem; padding:.1rem .6rem; border-radius:999px;
+      border:1px solid #1f2937; color:#9ca3af;
+    }
+    .card{
+      border-radius:.95rem; border:1px solid #020617;
+      background:radial-gradient(circle at top left,#020617,#020617,#020617);
+      padding:.6rem .7rem; display:flex; flex-direction:column; gap:.45rem; min-height:0;
+    }
+    .row{display:flex; flex-wrap:wrap; gap:.6rem;}
+    .row>*{flex:1; min-width:0;}
+    label{font-size:.75rem; color:#9ca3af; margin-bottom:.2rem; display:block;}
+    .input,textarea{
+      width:100%; border-radius:.65rem; border:1px solid #1f2937;
+      background:#020617; color:#e5e7eb; padding:.45rem .6rem;
+      font-size:.8rem; outline:none; resize:vertical; min-height:60px;
+    }
+    textarea.small{min-height:40px;}
+    .input:focus,textarea:focus{border-color:#22c55e; box-shadow:0 0 0 1px #22c55e33;}
+    .btn{
+      border-radius:999px; border:none; padding:.45rem .9rem;
+      font-size:.8rem; cursor:pointer; font-weight:600;
+      display:inline-flex; align-items:center; gap:.3rem;
+      background:linear-gradient(135deg,#22c55e,#3b82f6); color:white; box-shadow:0 0 12px #22c55e55;
+    }
+    .btn.secondary{
+      background:#020617; color:#9ca3af; border:1px solid #1f2937; box-shadow:none;
+    }
+    .btn:disabled{opacity:.6; box-shadow:none; cursor:default;}
+    .flex-between{display:flex; justify-content:space-between; align-items:center; gap:.5rem; flex-wrap:wrap;}
+    .pill-input{
+      display:inline-flex; align-items:center; gap:.3rem;
+      background:#020617; border-radius:999px; border:1px solid #1f2937;
+      padding-inline:.6rem; font-size:.75rem;
+    }
+    .pill-input span{color:#6b7280;}
+    .pill-input input{
+      border:none; background:transparent; color:#e5e7eb;
+      padding:.2rem 0; font-size:.75rem; outline:none; min-width:80px;
+    }
+    .chat-window{
+      border-radius:.8rem; border:1px solid #020617;
+      background:radial-gradient(circle at top,#020617,#020617,#020617);
+      padding:.5rem; max-height:260px; overflow-y:auto; font-size:.78rem;
+    }
+    .msg{margin-bottom:.4rem; line-height:1.55;}
+    .msg .from{font-size:.7rem; color:#6b7280;}
+    .bubble{
+      display:inline-block; margin-top:.1rem; padding:.35rem .5rem;
+      border-radius:.7rem; white-space:pre-wrap;
+    }
+    .msg.user .bubble{background:linear-gradient(135deg,#1e293b,#020617); float:left;}
+    .msg.ai .bubble{background:linear-gradient(135deg,#0f172a,#020617); border-inline-start:2px solid #22c55e; float:right;}
+    .msg::after{content:"";display:block;clear:both;}
+    .mem-list{max-height:220px; overflow-y:auto; font-size:.78rem;}
+    .mem-item{
+      padding:.35rem .4rem; border-radius:.65rem; border:1px solid #020617;
+      background:#020617; margin-bottom:.3rem;
+    }
+    .mem-item strong{font-size:.78rem; color:#e5e7eb;}
+    .mem-item small{font-size:.65rem; color:#6b7280;}
+    .mem-value{
+      margin-top:.2rem; font-family:ui-monospace,Menlo,Consolas,"Courier New",monospace;
+      font-size:.72rem; direction:ltr; text-align:left; white-space:pre-wrap;
+      background:#020617; padding:.25rem .35rem; border-radius:.45rem; border:1px solid #111827;
+    }
+    .builder-row{display:flex; flex-wrap:wrap; gap:.5rem; align-items:flex-end;}
+    .builder-row>*{flex:1; min-width:140px;}
+    .log{
+      font-size:.7rem; color:#9ca3af; max-height:120px; overflow-y:auto;
+      border-radius:.6rem; border:1px dashed #1f2937;
+      padding:.35rem .45rem; background:#020617;
+    }
+    .tag{display:inline-flex; align-items:center; gap:.25rem; border-radius:999px;
+      border:1px solid #1f2937; padding:.1rem .45rem; font-size:.7rem; color:#6b7280;}
+    .tag-dot{width:6px; height:6px; border-radius:999px; background:#22c55e;}
+    .camera-preview{
+      width:100%; border-radius:.8rem; border:1px solid #020617;
+      background:#000; max-height:240px; object-fit:cover;
+    }
+    .file-zone{
+      border-radius:.8rem; border:1px dashed #374151;
+      padding:.5rem; background:#020617; font-size:.78rem;
+    }
+    .file-zone input[type=file]{margin-top:.3rem; font-size:.75rem;}
+    .hint{font-size:.7rem; color:#6b7280;}
+    footer{padding:.5rem 1rem .7rem; text-align:center; font-size:.7rem; color:#4b5563;}
+    @media (max-width:900px){
+      .body{flex-direction:column-reverse;}
+      nav{width:100%; flex-direction:row; overflow-x:auto; border-inline-end:none;}
+      nav h2{display:none;}
+      .nav-btn{flex:1; min-width:140px; justify-content:center;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <h1>لوحة pai6 السيادية – واجهة التشغيل FULL v4</h1>
+      <span>يافا تتحكم من هنا (LOW / NON CODE) والباك إند ينفّذ (حاويات، قواعد بيانات، ملفات ضخمة، أجهزة).</span>
+    </div>
+    <div class="api-config">
+      <div>
+        <input id="apiBaseInput" type="text" placeholder="API URL مثال: https://pai6-backend.onrender.com" />
+        <div class="api-status" id="apiStatus"></div>
+      </div>
+      <div>
+        <input id="adminKeyInput" type="password" placeholder="Admin Key (اختياري للأدمن)" />
+      </div>
+      <button id="saveApiBtn">حفظ</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="shell">
+      <div class="shell-header">
+        <div class="dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <div class="shell-title">pai6 :: sovereign-dashboard</div>
+        <div class="shell-badge">LOW / NON CODE • LAW MANUAL • READY FOR HEAVY FILES</div>
+      </div>
+      <div class="body">
+        <nav>
+          <h2>الوحدات</h2>
+          <button class="nav-btn active" data-panel="chat">
+            <span class="icon">💬</span>
+            <div>شات التشغيل<small>نص + صوت</small></div>
+          </button>
+          <button class="nav-btn" data-panel="memory">
+            <span class="icon">🧠</span>
+            <div>الذاكرة<small>تفضيلات & إعدادات</small></div>
+          </button>
+          <button class="nav-btn" data-panel="builder">
+            <span class="icon">🛠️</span>
+            <div>مصنع المشاريع<small>حزم / سكربتات / خدمات</small></div>
+          </button>
+          <button class="nav-btn" data-panel="files">
+            <span class="icon">📂</span>
+            <div>ملفات & كاميرا<small>Excel / CAD / Media / OCR</small></div>
+          </button>
+          <div class="nav-footer">
+            الواجهة لا تنفذ أي كود بنفسها؛ كل شيء يذهب إلى الباك إند (عبدالله/الباكستاني) عبر API واحد.
+          </div>
+        </nav>
+
+        <section class="content">
+          <!-- CHAT -->
+          <div class="panel" id="panel-chat">
+            <div class="panel-title">
+              <h3>شاشة الشات التشغيلية (نص + صوت)</h3>
+              <div class="badge-soft">يتكلم مع /api/chat و /api/voice/stt</div>
+            </div>
+            <div class="card">
+              <div class="row">
+                <div>
+                  <label>المحادثة</label>
+                  <div class="chat-window" id="chatWindow"></div>
+                </div>
+                <div style="max-width:280px;">
+                  <label>أمر / سؤال</label>
+                  <textarea id="chatInput" class="small" placeholder="اكتب الأمر أو السؤال هنا..."></textarea>
+                  <div class="flex-between" style="margin-top:.35rem;">
+                    <div class="pill-input">
+                      <span>Fingerprint</span>
+                      <input id="fingerprintInput" type="text" value="nasser_profile_v1" />
+                    </div>
+                    <button class="btn" id="sendChatBtn"><span>إرسال</span><span>⏣</span></button>
+                  </div>
+                  <div class="flex-between" style="margin-top:.45rem;">
+                    <button class="btn secondary" id="micBtn">🎙️ تسجيل صوت</button>
+                    <span id="micStatus" class="hint">الصوت يرسل كملف إلى /api/voice/stt (محرك STT الحقيقي في الباك إند).</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MEMORY -->
+          <div class="panel" id="panel-memory" style="display:none;">
+            <div class="panel-title">
+              <h3>ذاكرة البصمة التشغيلية</h3>
+              <div class="badge-soft">واجهة لـ /api/memory/save & /api/memory/list</div>
+            </div>
+            <div class="row">
+              <div class="card">
+                <div class="flex-between">
+                  <label>إضافة / تعديل عنصر ذاكرة</label>
+                  <span class="tag"><span class="tag-dot"></span> مربوطة بـ fingerprint في تبويب الشات</span>
+                </div>
+                <div class="builder-row">
+                  <div>
+                    <label>المفتاح (Key)</label>
+                    <input id="memKeyInput" class="input" placeholder="مثال: preference_language" />
+                  </div>
+                  <div>
+                    <label>القيمة (JSON أو نص)</label>
+                    <textarea id="memValueInput" class="small" placeholder='مثال: {"lang":"ar","dialect":"jo-pal"}'></textarea>
+                  </div>
+                  <div style="flex:0 0 auto;">
+                    <button class="btn" id="saveMemBtn">💾 حفظ الذاكرة</button>
+                  </div>
+                </div>
+                <div class="hint" style="margin-top:.3rem;">
+                  الطلبات تذهب كما هي إلى `/api/memory/save`؛ البنية الداخلية للذاكرة يحددها الباك إند لاحقًا (DB / ملفات / Redis).
+                </div>
+              </div>
+              <div class="card" style="max-width:320px;">
+                <div class="flex-between">
+                  <label>الذكريات المحفوظة</label>
+                  <button class="btn secondary" id="refreshMemBtn">تحديث القائمة</button>
+                </div>
+                <div id="memList" class="mem-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BUILDER -->
+          <div class="panel" id="panel-builder" style="display:none;">
+            <div class="panel-title">
+              <h3>مصنع المشاريع / الحزم (Builder)</h3>
+              <div class="badge-soft">يتحدث مع /api/builder/create & /download</div>
+            </div>
+            <div class="card">
+              <div class="builder-row">
+                <div>
+                  <label>اسم المشروع</label>
+                  <input id="projNameInput" class="input" placeholder="مثال: auto_container_engine" />
+                </div>
+                <div>
+                  <label>نوع المشروع</label>
+                  <input id="projTypeInput" class="input" value="python_script" />
+                </div>
+              </div>
+              <div style="margin-top:.4rem;">
+                <label>الوصف / Spec</label>
+                <textarea id="projSpecInput" placeholder="صف المطلوب: سكربت، خدمة API، حاوية، موصل Primavera، محلل Excel، موصل AutoCAD..."></textarea>
+              </div>
+              <div class="flex-between" style="margin-top:.45rem;">
+                <button class="btn" id="buildProjBtn">⚙️ بناء المشروع</button>
+                <a id="downloadLink" href="#" style="display:none;" class="btn secondary">⬇️ تحميل آخر حزمة</a>
+              </div>
+              <div style="margin-top:.4rem;">
+                <label>سجل العمليات</label>
+                <div class="log" id="builderLog"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FILES & CAMERA -->
+          <div class="panel" id="panel-files" style="display:none;">
+            <div class="panel-title">
+              <h3>ملفات ثقيلة & كاميرا (أمامية/خلفية)</h3>
+              <div class="badge-soft">واجهة لـ /api/vision/ocr و /api/files/upload</div>
+            </div>
+            <div class="row">
+              <div class="card">
+                <label>الكاميرا (صور / OCR / فحص أجهزة)</label>
+                <video id="cameraPreview" class="camera-preview" playsinline></video>
+                <div class="flex-between" style="margin-top:.4rem;">
+                  <div class="flex-between" style="gap:.3rem;">
+                    <button class="btn secondary" id="frontCamBtn">📷 كاميرا أمامية</button>
+                    <button class="btn secondary" id="backCamBtn">📷 كاميرا خلفية</button>
+                  </div>
+                  <button class="btn" id="captureBtn">📸 التقاط صورة وإرسال</button>
+                </div>
+                <div class="hint">
+                  الصورة تُرسل إلى `/api/vision/ocr` كملف؛ الباك إند يمكنه لاحقاً:
+                  - تشغيل OCR
+                  - تحليل أجهزة
+                  - ربطها بـ AutoCAD أو جداول فحص.
+                </div>
+              </div>
+              <div class="card">
+                <label>رفع مجموعة ملفات هندسية / تشغيلية</label>
+                <div class="file-zone">
+                  <div>اختر ملفات (Excel / CAD / Primavera / PDF / Media / ZIP ...):</div>
+                  <input id="engFilesInput" type="file" multiple
+                    accept=".xls,.xlsx,.csv,.xer,.xml,.dwg,.dxf,.ifc,.rvt,.edb,.mdb,.pdf,.jpg,.jpeg,.png,.mp4,.mov,.zip" />
+                  <div class="hint" style="margin-top:.25rem;">
+                    يتم إرسال الملفات عبر `/api/files/upload` مع fingerprint و category، والتحليل الحقيقي يكون في الباك إند (ETL, CAD parsers, Primavera, ...).
+                  </div>
+                  <div style="margin-top:.4rem;">
+                    <button class="btn" id="uploadEngBtn">⬆️ رفع الملفات</button>
+                  </div>
+                  <div class="log" id="filesLog" style="margin-top:.4rem; max-height:100px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    إصدار FULL v4 – يمكن رفع هذا الملف مباشرة على Netlify / أي استضافة static، ثم ربطه بباك إند pai6-backend-v2 على Render أو أي سيرفر.
+  </footer>
+
+  <script>
+    const state = {
+      apiBase: "",
+      adminKey: "",
+      currentPanel: "chat",
+      mediaStream: null,
+      isRecording: false,
+      recorder: null,
+      audioChunks: []
+    };
+
+    const apiInput = document.getElementById("apiBaseInput");
+    const apiStatus = document.getElementById("apiStatus");
+    const adminKeyInput = document.getElementById("adminKeyInput");
+    const saveApiBtn = document.getElementById("saveApiBtn");
+
+    (function initApi() {
+      const savedBase = window.localStorage.getItem("pai6_api_base");
+      const savedAdmin = window.localStorage.getItem("pai6_admin_key");
+      if (savedBase) {
+        state.apiBase = savedBase;
+        apiInput.value = savedBase;
+        apiStatus.textContent = "تم تحميل رابط الـ API من المتصفح.";
+      } else {
+        apiStatus.textContent = "أدخل رابط الباك إند (Render / Google) ثم اضغط حفظ.";
+      }
+      if (savedAdmin) {
+        state.adminKey = savedAdmin;
+        adminKeyInput.value = savedAdmin;
+      }
+    })();
+
+    saveApiBtn.addEventListener("click", () => {
+      const val = apiInput.value.trim();
+      if (!val) {
+        apiStatus.textContent = "من فضلك أدخل رابط صحيح أولاً.";
+        return;
+      }
+      state.apiBase = val.replace(/\/$/, "");
+      window.localStorage.setItem("pai6_api_base", state.apiBase);
+      apiStatus.textContent = "تم حفظ رابط الـ API. كل الوحدات ستستخدم هذا الرابط.";
+    });
+
+    function getApiUrl(path) {
+      if (!state.apiBase) {
+        throw new Error("لم يتم ضبط رابط الـ API بعد.");
+      }
+      return state.apiBase + path;
+    }
+
+    function withAdmin(headers = {}) {
+      if (state.adminKey) {
+        headers["X-Admin-Token"] = state.adminKey;
+      }
+      return headers;
+    }
+
+    // التنقل بين التبويبات
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const panels = {
+      chat: document.getElementById("panel-chat"),
+      memory: document.getElementById("panel-memory"),
+      builder: document.getElementById("panel-builder"),
+      files: document.getElementById("panel-files"),
+    };
+    navButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const panel = btn.getAttribute("data-panel");
+        if (!panel) return;
+        state.currentPanel = panel;
+        navButtons.forEach(b => b.classList.toggle("active", b === btn));
+        Object.keys(panels).forEach(k => {
+          panels[k].style.display = (k === panel) ? "block" : "none";
+        });
+      });
+    });
+
+    // CHAT
+    const chatWindow = document.getElementById("chatWindow");
+    const chatInput = document.getElementById("chatInput");
+    const sendChatBtn = document.getElementById("sendChatBtn");
+    const fingerprintInput = document.getElementById("fingerprintInput");
+    const micBtn = document.getElementById("micBtn");
+    const micStatus = document.getElementById("micStatus");
+
+    function appendMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + (role === "user" ? "user" : "ai");
+      const from = document.createElement("div");
+      from.className = "from";
+      from.textContent = role === "user" ? "أنت" : "pai6-backend";
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+      div.appendChild(from);
+      div.appendChild(bubble);
+      chatWindow.appendChild(div);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    sendChatBtn.addEventListener("click", async () => {
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+      const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
+      appendMessage("user", msg);
+      chatInput.value = "";
+      sendChatBtn.disabled = true;
+      try {
+        const url = getApiUrl("/api/chat");
+        const res = await fetch(url, {
+          method: "POST",
+          headers: withAdmin({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ message: msg, fingerprint: fp })
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        appendMessage("ai", data.reply || "[لا يوجد رد]");
+      } catch (err) {
+        appendMessage("ai", "خطأ في الاتصال بالـ API: " + err.message);
+      } finally {
+        sendChatBtn.disabled = false;
+      }
+    });
+
+    // VOICE (تسجيل وإرسال إلى /api/voice/stt)
+    async function startRecording() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        micStatus.textContent = "المتصفح لا يدعم المايك أو أنه محظور.";
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        state.mediaStream = stream;
+        state.audioChunks = [];
+        const recorder = new MediaRecorder(stream);
+        state.recorder = recorder;
+        recorder.ondataavailable = e => {
+          if (e.data.size > 0) state.audioChunks.push(e.data);
+        };
+        recorder.onstop = async () => {
+          if (state.mediaStream) {
+            state.mediaStream.getTracks().forEach(t => t.stop());
+          }
+          const blob = new Blob(state.audioChunks, { type: "audio/webm" });
+          micStatus.textContent = "جاري إرسال الصوت إلى /api/voice/stt (إن وُجد في الباك إند)...";
+          try {
+            const url = getApiUrl("/api/voice/stt");
+            const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
+            const form = new FormData();
+            form.append("file", blob, "voice.webm");
+            form.append("fingerprint", fp);
+            const res = await fetch(url, { method: "POST", headers: withAdmin(), body: form });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            const data = await res.json();
+            const text = data.text || JSON.stringify(data);
+            appendMessage("ai", "رد STT: " + text);
+            micStatus.textContent = "تم إرسال الصوت واستلام الرد من الباك إند (placeholder).";
+          } catch (err) {
+            micStatus.textContent = "انتهى التسجيل، لكن لم يتم استدعاء /api/voice/stt: " + err.message;
+          }
+        };
+        recorder.start();
+        state.isRecording = true;
+        micBtn.textContent = "⏹️ إيقاف التسجيل";
+        micStatus.textContent = "جاري التسجيل... اضغط مرة أخرى للإيقاف.";
+      } catch (err) {
+        micStatus.textContent = "فشل بدء التسجيل: " + err.message;
+      }
+    }
+
+    function stopRecording() {
+      if (state.recorder && state.recorder.state !== "inactive") {
+        state.recorder.stop();
+      }
+      state.isRecording = false;
+      micBtn.textContent = "🎙️ تسجيل صوت";
+    }
+
+    micBtn.addEventListener("click", () => {
+      if (!state.isRecording) startRecording(); else stopRecording();
+    });
+
+    // MEMORY
+    const memKeyInput = document.getElementById("memKeyInput");
+    const memValueInput = document.getElementById("memValueInput");
+    const saveMemBtn = document.getElementById("saveMemBtn");
+    const refreshMemBtn = document.getElementById("refreshMemBtn");
+    const memList = document.getElementById("memList");
+
+    saveMemBtn.addEventListener("click", async () => {
+      const key = memKeyInput.value.trim();
+      let valueRaw = memValueInput.value.trim();
+      const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
+      if (!key) { alert("أدخل key أولاً."); return; }
+      let value;
+      if (!valueRaw) value = "";
+      else {
+        try { value = JSON.parse(valueRaw); }
+        catch { value = valueRaw; }
+      }
+      saveMemBtn.disabled = true;
+      try {
+        const url = getApiUrl("/api/memory/save");
+        const res = await fetch(url, {
+          method: "POST",
+          headers: withAdmin({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ fingerprint: fp, key, value })
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        await res.json();
+        memKeyInput.value = ""; memValueInput.value = "";
+        loadMemories();
+      } catch (err) {
+        alert("خطأ في حفظ الذاكرة: " + err.message);
+      } finally {
+        saveMemBtn.disabled = false;
+      }
+    });
+
+    async function loadMemories() {
+      const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
+      memList.innerHTML = "<div class='hint'>جارٍ تحميل الذكريات...</div>";
+      try {
+        const url = getApiUrl("/api/memory/list?fingerprint=" + encodeURIComponent(fp));
+        const res = await fetch(url, { headers: withAdmin() });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        memList.innerHTML = "";
+        (data.items || []).forEach(item => {
+          const el = document.createElement("div");
+          el.className = "mem-item";
+          const title = document.createElement("div");
+          const strong = document.createElement("strong");
+          strong.textContent = item.key;
+          const small = document.createElement("small");
+          small.textContent = " • #" + item.id;
+          title.appendChild(strong); title.appendChild(small);
+          const val = document.createElement("div");
+          val.className = "mem-value";
+          try { val.textContent = JSON.stringify(item.value, null, 2); }
+          catch { val.textContent = String(item.value); }
+          el.appendChild(title); el.appendChild(val);
+          memList.appendChild(el);
+        });
+        if (!memList.innerHTML) {
+          memList.innerHTML = "<div class='hint'>لا توجد ذاكرة بعد لهذه البصمة.</div>";
+        }
+      } catch (err) {
+        memList.innerHTML = "<div style='color:#f97373;font-size:.75rem;'>فشل تحميل الذكريات: " + err.message + "</div>";
+      }
+    }
+
+    refreshMemBtn.addEventListener("click", loadMemories);
+
+    // BUILDER
+    const projNameInput = document.getElementById("projNameInput");
+    const projTypeInput = document.getElementById("projTypeInput");
+    const projSpecInput = document.getElementById("projSpecInput");
+    const buildProjBtn = document.getElementById("buildProjBtn");
+    const builderLog = document.getElementById("builderLog");
+    const downloadLink = document.getElementById("downloadLink");
+
+    function logBuilder(msg) {
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement("div");
+      line.textContent = "[" + time + "] " + msg;
+      builderLog.appendChild(line);
+      builderLog.scrollTop = builderLog.scrollHeight;
+    }
+
+    buildProjBtn.addEventListener("click", async () => {
+      const name = projNameInput.value.trim();
+      const type = projTypeInput.value.trim() || "python_script";
+      const spec = projSpecInput.value.trim();
+      const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
+      if (!name) { alert("أدخل اسم المشروع."); return; }
+      buildProjBtn.disabled = true;
+      logBuilder("بدء بناء المشروع: " + name + " ...");
+      try {
+        const url = getApiUrl("/api/builder/create");
+        const res = await fetch(url, {
+          method: "POST",
+          headers: withAdmin({ "Content-Type": "application/json" }),
+          body: JSON.stringify({
+            fingerprint: fp,
+            project_name: name,
+            project_type: type,
+            spec: spec || "مشروع بدون وصف مفصل (من لوحة pai6)."
+          })
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        const rel = data.download_url || ("/api/builder/download/" + encodeURIComponent(name) + ".zip");
+        const full = getApiUrl(rel.replace(/^https?:\/\/[^/]+/, ""));
+        downloadLink.href = full;
+        downloadLink.style.display = "inline-flex";
+        logBuilder("تم بناء الحزمة. جاهزة للتحميل.");
+      } catch (err) {
+        logBuilder("خطأ في البناء: " + err.message);
+      } finally {
+        buildProjBtn.disabled = false;
+      }
+    });
+
+    // FILES & CAMERA
+    const cameraPreview = document.getElementById("cameraPreview");
+    const frontCamBtn = document.getElementById("frontCamBtn");
+    const backCamBtn = document.getElementById("backCamBtn");
+    const captureBtn = document.getElementById("captureBtn");
+    const engFilesInput = document.getElementById("engFilesInput");
+    const uploadEngBtn = document.getElementById("uploadEngBtn");
+    const filesLog = document.getElementById("filesLog");
+
+    async function startCamera(useBack) {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        filesLog.textContent = "المتصفح لا يدعم الكاميرا أو أنها محظورة.";
+        return;
+      }
+      try {
+        if (state.mediaStream) {
+          state.mediaStream.getTracks().forEach(t => t.stop());
+        }
+        const constraints = { video: { facingMode: useBack ? "environment" : "user" }, audio: false };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        state.mediaStream = stream;
+        cameraPreview.srcObject = stream;
+        cameraPreview.play();
+        filesLog.textContent = "الكاميرا تعمل (" + (useBack ? "خلفية" : "أمامية") + ").";
+      } catch (err) {
+        filesLog.textContent = "فشل تشغيل الكاميرا: " + err.message;
+      }
+    }
+
+    frontCamBtn.addEventListener("click", () => startCamera(false));
+    backCamBtn.addEventListener("click", () => startCamera(true));
+
+    captureBtn.addEventListener("click", async () => {
+      if (!state.mediaStream || !cameraPreview.videoWidth) {
+        filesLog.textContent = "شغّل الكاميرا أولاً ثم التقط صورة.";
+        return;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = cameraPreview.videoWidth;
+      canvas.height = cameraPreview.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(cameraPreview, 0, 0);
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        filesLog.textContent = "تم التقاط صورة. محاولة إرسالها إلى /api/vision/ocr ...";
+        try {
+          const url = getApiUrl("/api/vision/ocr");
+          const form = new FormData();
+          form.append("image", blob, "capture.png");
+          const res = await fetch(url, { method: "POST", headers: withAdmin(), body: form });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const data = await res.json();
+          const text = data.text || JSON.stringify(data);
+          filesLog.textContent = "رد /api/vision/ocr: " + text.substring(0, 200);
+        } catch (err) {
+          filesLog.textContent = "لم يتم إرسال الصورة (ربما المسار غير جاهز في الباك إند): " + err.message;
+        }
+      }, "image/png");
+    });
+
+    function logFiles(msg) {
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement("div");
+      line.textContent = "[" + time + "] " + msg;
+      filesLog.appendChild(line);
+      filesLog.scrollTop = filesLog.scrollHeight;
+    }
+
+    uploadEngBtn.addEventListener("click", async () => {
+      const files = engFilesInput.files;
+      if (!files || files.length === 0) { alert("اختر ملفات أولاً."); return; }
+      const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
+      const form = new FormData();
+      for (let i = 0; i < files.length; i++) form.append("files", files[i]);
+      form.append("fingerprint", fp);
+      form.append("category", "engineering_bundle");
+      uploadEngBtn.disabled = true;
+      logFiles("بدء رفع " + files.length + " ملف/ملفات إلى /api/files/upload ...");
+      try {
+        const url = getApiUrl("/api/files/upload");
+        const res = await fetch(url, { method: "POST", headers: withAdmin(), body: form });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        logFiles("تم الرفع. رد الباك إند: " + JSON.stringify(data).substring(0, 200));
+      } catch (err) {
+        logFiles("خطأ في الرفع أو المسار غير مفعّل بعد: " + err.message);
+      } finally {
+        uploadEngBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
