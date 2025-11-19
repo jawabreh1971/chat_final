@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import files, vision, builder, chat, memory, voice  # استدعاء الروترات
 import os
 import openai
+from app.autopilot_v7 import autopilot_router
 
 # التحقق من وجود مفتاح OpenAI في البيئة
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -36,7 +37,7 @@ app.include_router(builder.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(memory.router, prefix="/api")
 app.include_router(voice.router, prefix="/api")
-
+app.include_router(autopilot_router, prefix="/api")
 # ملفات ثابتة
 app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
@@ -47,3 +48,8 @@ templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "t
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/healthz")
+def health_check():
+    return {"status": "ok"}
