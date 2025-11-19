@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>لوحة pai6 السيادية – FULL v4</title>
+  <title>لوحة pai6 السيادية – FULL v4.1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * { box-sizing: border-box; }
@@ -194,7 +193,7 @@
 <body>
   <header>
     <div class="title">
-      <h1>لوحة pai6 السيادية – واجهة التشغيل FULL v4</h1>
+      <h1>لوحة pai6 السيادية – واجهة التشغيل FULL v4.1</h1>
       <span>يافا تتحكم من هنا (LOW / NON CODE) والباك إند ينفّذ (حاويات، قواعد بيانات، ملفات ضخمة، أجهزة).</span>
     </div>
     <div class="api-config">
@@ -395,15 +394,17 @@
   </main>
 
   <footer>
-    إصدار FULL v4 – يمكن رفع هذا الملف مباشرة على Netlify / أي استضافة static، ثم ربطه بباك إند pai6-backend-v2 على Render أو أي سيرفر.
+    إصدار FULL v4.1 – يمكن رفع هذا الملف مباشرة على Netlify / أي استضافة static، ثم ربطه بباك إند pai6-backend-v2 على Render أو أي سيرفر.
   </footer>
 
   <script>
+    // حالة عامة للواجهة
     const state = {
       apiBase: "",
       adminKey: "",
       currentPanel: "chat",
-      mediaStream: null,
+      audioStream: null, // ستريم الصوت
+      videoStream: null, // ستريم الكاميرا
       isRecording: false,
       recorder: null,
       audioChunks: []
@@ -414,12 +415,13 @@
     const adminKeyInput = document.getElementById("adminKeyInput");
     const saveApiBtn = document.getElementById("saveApiBtn");
 
+    // تهيئة رابط الـ API من localStorage
     (function initApi() {
       const savedBase = window.localStorage.getItem("pai6_api_base") || "https://chat-final-q8mj.onrender.com";
       const savedAdmin = window.localStorage.getItem("pai6_admin_key");
       if (savedBase) {
-        state.apiBase = savedBase;
-        apiInput.value = savedBase;
+        state.apiBase = savedBase.replace(/\/$/, "");
+        apiInput.value = state.apiBase;
         apiStatus.textContent = "تم تحميل رابط الـ API من المتصفح.";
       } else {
         apiStatus.textContent = "أدخل رابط الباك إند (Render / Google) ثم اضغط حفظ.";
@@ -528,9 +530,13 @@
         micStatus.textContent = "المتصفح لا يدعم المايك أو أنه محظور.";
         return;
       }
+      if (typeof MediaRecorder === "undefined") {
+        micStatus.textContent = "المتصفح لا يدعم MediaRecorder (تسجيل صوت مباشر).";
+        return;
+      }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        state.mediaStream = stream;
+        state.audioStream = stream;
         state.audioChunks = [];
         const recorder = new MediaRecorder(stream);
         state.recorder = recorder;
@@ -538,8 +544,9 @@
           if (e.data.size > 0) state.audioChunks.push(e.data);
         };
         recorder.onstop = async () => {
-          if (state.mediaStream) {
-            state.mediaStream.getTracks().forEach(t => t.stop());
+          if (state.audioStream) {
+            state.audioStream.getTracks().forEach(t => t.stop());
+            state.audioStream = null;
           }
           const blob = new Blob(state.audioChunks, { type: "audio/webm" });
           micStatus.textContent = "جاري إرسال الصوت إلى /api/voice/stt (إن وُجد في الباك إند)...";
@@ -717,12 +724,13 @@
         return;
       }
       try {
-        if (state.mediaStream) {
-          state.mediaStream.getTracks().forEach(t => t.stop());
+        if (state.videoStream) {
+          state.videoStream.getTracks().forEach(t => t.stop());
+          state.videoStream = null;
         }
         const constraints = { video: { facingMode: useBack ? "environment" : "user" }, audio: false };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        state.mediaStream = stream;
+        state.videoStream = stream;
         cameraPreview.srcObject = stream;
         cameraPreview.play();
         filesLog.textContent = "الكاميرا تعمل (" + (useBack ? "خلفية" : "أمامية") + ").";
@@ -735,7 +743,7 @@
     backCamBtn.addEventListener("click", () => startCamera(true));
 
     captureBtn.addEventListener("click", async () => {
-      if (!state.mediaStream || !cameraPreview.videoWidth) {
+      if (!state.videoStream || !cameraPreview.videoWidth) {
         filesLog.textContent = "شغّل الكاميرا أولاً ثم التقط صورة.";
         return;
       }
