@@ -348,6 +348,24 @@
     };
     reader.readAsText(file);
   };
+  // دالة مساعدة لفتح/إغلاق لوحة الأدمن برمجياً
+function setAdminMode(on) {
+  adminPanel.style.display = on ? "flex" : "none";
+  adminToggle.classList.toggle("active", on);
+  mainGrid.style.gridTemplateColumns = on ? "2fr 1fr" : "1fr 0";
+}
+
+// تعديل كليك الزر ليستخدم الدالة
+adminToggle.onclick = () => {
+  const show = adminPanel.style.display === "none";
+  setAdminMode(show);
+};
+
+// فتح الأدمن تلقائياً لو الرابط فيه ?admin=1
+const params = new URLSearchParams(window.location.search);
+if (params.get("admin") === "1") {
+  setAdminMode(true);
+}
 
 </script>
 
