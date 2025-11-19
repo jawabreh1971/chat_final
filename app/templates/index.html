@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>لوحة pai6 السيادية – FULL v4.1</title>
+  <title>لوحة pai6 السيادية – FULL v5</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * { box-sizing: border-box; }
@@ -18,9 +18,10 @@
     header {
       padding: 1rem 1.5rem;
       border-bottom: 1px solid #111827;
-      background: radial-gradient(circle at top left,#22c55e33,transparent 55%),
-                  radial-gradient(circle at top right,#3b82f633,transparent 55%),
-                  #020617;
+      background:
+        radial-gradient(circle at top left,#22c55e33,transparent 55%),
+        radial-gradient(circle at top right,#3b82f633,transparent 55%),
+        #020617;
       display: flex;
       flex-wrap: wrap;
       gap: .75rem;
@@ -193,7 +194,7 @@
 <body>
   <header>
     <div class="title">
-      <h1>لوحة pai6 السيادية – واجهة التشغيل FULL v4.1</h1>
+      <h1>لوحة pai6 السيادية – واجهة التشغيل FULL v5</h1>
       <span>يافا تتحكم من هنا (LOW / NON CODE) والباك إند ينفّذ (حاويات، قواعد بيانات، ملفات ضخمة، أجهزة).</span>
     </div>
     <div class="api-config">
@@ -239,7 +240,7 @@
             <div>ملفات & كاميرا<small>Excel / CAD / Media / OCR</small></div>
           </button>
           <div class="nav-footer">
-            الواجهة لا تنفذ أي كود بنفسها؛ كل شيء يذهب إلى الباك إند (عبدالله/الباكستاني) عبر API واحد.
+            الواجهة لا تنفذ أي كود بنفسها؛ كل شيء يذهب إلى الباك إند عبر API واحد.
           </div>
         </nav>
 
@@ -301,7 +302,7 @@
                   </div>
                 </div>
                 <div class="hint" style="margin-top:.3rem;">
-                  الطلبات تذهب كما هي إلى `/api/memory/save`؛ البنية الداخلية للذاكرة يحددها الباك إند لاحقًا (DB / ملفات / Redis).
+                  الطلبات تذهب كما هي إلى `/api/memory/save`؛ البنية الداخلية للذاكرة يحددها الباك إند لاحقًا.
                 </div>
               </div>
               <div class="card" style="max-width:320px;">
@@ -364,10 +365,7 @@
                   <button class="btn" id="captureBtn">📸 التقاط صورة وإرسال</button>
                 </div>
                 <div class="hint">
-                  الصورة تُرسل إلى `/api/vision/ocr` كملف؛ الباك إند يمكنه لاحقاً:
-                  - تشغيل OCR
-                  - تحليل أجهزة
-                  - ربطها بـ AutoCAD أو جداول فحص.
+                  الصورة تُرسل إلى `/api/vision/ocr` كملف؛ التحليل الحقيقي يكون في الباك إند (OCR، تحليل أجهزة، ربط هندسي...).
                 </div>
               </div>
               <div class="card">
@@ -377,7 +375,7 @@
                   <input id="engFilesInput" type="file" multiple
                     accept=".xls,.xlsx,.csv,.xer,.xml,.dwg,.dxf,.ifc,.rvt,.edb,.mdb,.pdf,.jpg,.jpeg,.png,.mp4,.mov,.zip" />
                   <div class="hint" style="margin-top:.25rem;">
-                    يتم إرسال الملفات عبر `/api/files/upload` مع fingerprint و category، والتحليل الحقيقي يكون في الباك إند (ETL, CAD parsers, Primavera, ...).
+                    يتم إرسال الملفات عبر `/api/files/upload` مع fingerprint و category؛ التحليل في الباك إند.
                   </div>
                   <div style="margin-top:.4rem;">
                     <button class="btn" id="uploadEngBtn">⬆️ رفع الملفات</button>
@@ -394,41 +392,46 @@
   </main>
 
   <footer>
-    إصدار FULL v4.1 – يمكن رفع هذا الملف مباشرة على Netlify / أي استضافة static، ثم ربطه بباك إند pai6-backend-v2 على Render أو أي سيرفر.
+    إصدار FULL v5 – ملف HTML واحد، جاهز للرفع على Netlify / GitHub / أي استضافة static، مع ربطه بباك إند pai6.
   </footer>
 
   <script>
-    // حالة عامة للواجهة
+    // ===== حالة عامة للواجهة =====
     const state = {
       apiBase: "",
       adminKey: "",
       currentPanel: "chat",
-      audioStream: null, // ستريم الصوت
-      videoStream: null, // ستريم الكاميرا
+      audioStream: null,
+      videoStream: null,
       isRecording: false,
       recorder: null,
       audioChunks: []
     };
 
+    // ===== عناصر عامة =====
     const apiInput = document.getElementById("apiBaseInput");
     const apiStatus = document.getElementById("apiStatus");
     const adminKeyInput = document.getElementById("adminKeyInput");
     const saveApiBtn = document.getElementById("saveApiBtn");
 
-    // تهيئة رابط الـ API من localStorage
+    // تهيئة API من المتصفح
     (function initApi() {
-      const savedBase = window.localStorage.getItem("pai6_api_base") || "https://chat-final-q8mj.onrender.com";
-      const savedAdmin = window.localStorage.getItem("pai6_admin_key");
-      if (savedBase) {
-        state.apiBase = savedBase.replace(/\/$/, "");
-        apiInput.value = state.apiBase;
-        apiStatus.textContent = "تم تحميل رابط الـ API من المتصفح.";
-      } else {
-        apiStatus.textContent = "أدخل رابط الباك إند (Render / Google) ثم اضغط حفظ.";
-      }
-      if (savedAdmin) {
-        state.adminKey = savedAdmin;
-        adminKeyInput.value = savedAdmin;
+      try {
+        const savedBase = window.localStorage.getItem("pai6_api_base") || "";
+        const savedAdmin = window.localStorage.getItem("pai6_admin_key") || "";
+        if (savedBase) {
+          state.apiBase = savedBase.replace(/\/$/, "");
+          apiInput.value = state.apiBase;
+          apiStatus.textContent = "تم تحميل رابط الـ API من المتصفح.";
+        } else {
+          apiStatus.textContent = "أدخل رابط الباك إند (Render / Google) ثم اضغط حفظ.";
+        }
+        if (savedAdmin) {
+          state.adminKey = savedAdmin;
+          adminKeyInput.value = savedAdmin;
+        }
+      } catch (e) {
+        apiStatus.textContent = "تعذّر استخدام localStorage في هذا المتصفح.";
       }
     })();
 
@@ -439,14 +442,35 @@
         return;
       }
       state.apiBase = val.replace(/\/$/, "");
-      window.localStorage.setItem("pai6_api_base", state.apiBase);
+      try {
+        window.localStorage.setItem("pai6_api_base", state.apiBase);
+        if (adminKeyInput.value.trim()) {
+          state.adminKey = adminKeyInput.value.trim();
+          window.localStorage.setItem("pai6_admin_key", state.adminKey);
+        }
+      } catch (e) {
+        // لو localStorage مقفول، نكمل عادي بدون تخزين
+      }
       apiStatus.textContent = "تم حفظ رابط الـ API. كل الوحدات ستستخدم هذا الرابط.";
     });
 
-    function getApiUrl(path) {
+    adminKeyInput.addEventListener("change", () => {
+      const val = adminKeyInput.value.trim();
+      state.adminKey = val;
+      try {
+        window.localStorage.setItem("pai6_admin_key", state.adminKey);
+      } catch (e) {}
+    });
+
+    function ensureApiBase() {
       if (!state.apiBase) {
-        throw new Error("لم يتم ضبط رابط الـ API بعد.");
+        apiStatus.textContent = "ضبط رابط الباك إند أولاً (API URL).";
+        return false;
       }
+      return true;
+    }
+
+    function getApiUrl(path) {
       return state.apiBase + path;
     }
 
@@ -457,7 +481,7 @@
       return headers;
     }
 
-    // التنقل بين التبويبات
+    // ===== التنقل بين التبويبات =====
     const navButtons = document.querySelectorAll(".nav-btn");
     const panels = {
       chat: document.getElementById("panel-chat"),
@@ -477,7 +501,7 @@
       });
     });
 
-    // CHAT
+    // ===== CHAT =====
     const chatWindow = document.getElementById("chatWindow");
     const chatInput = document.getElementById("chatInput");
     const sendChatBtn = document.getElementById("sendChatBtn");
@@ -503,6 +527,10 @@
     sendChatBtn.addEventListener("click", async () => {
       const msg = chatInput.value.trim();
       if (!msg) return;
+      if (!ensureApiBase()) {
+        appendMessage("ai", "يرجى ضبط رابط الـ API أولاً من الأعلى.");
+        return;
+      }
       const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
       appendMessage("user", msg);
       chatInput.value = "";
@@ -516,7 +544,7 @@
         });
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
-        appendMessage("ai", data.reply || "[لا يوجد رد]");
+        appendMessage("ai", data.reply || "[لا يوجد رد من الباك إند]");
       } catch (err) {
         appendMessage("ai", "خطأ في الاتصال بالـ API: " + err.message);
       } finally {
@@ -524,7 +552,7 @@
       }
     });
 
-    // VOICE (تسجيل وإرسال إلى /api/voice/stt)
+    // تسجيل الصوت
     async function startRecording() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         micStatus.textContent = "المتصفح لا يدعم المايك أو أنه محظور.";
@@ -534,38 +562,46 @@
         micStatus.textContent = "المتصفح لا يدعم MediaRecorder (تسجيل صوت مباشر).";
         return;
       }
+      if (!ensureApiBase()) {
+        micStatus.textContent = "اضبط رابط الـ API أولاً قبل التسجيل.";
+        return;
+      }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         state.audioStream = stream;
         state.audioChunks = [];
         const recorder = new MediaRecorder(stream);
         state.recorder = recorder;
+
         recorder.ondataavailable = e => {
-          if (e.data.size > 0) state.audioChunks.push(e.data);
+          if (e.data && e.data.size > 0) state.audioChunks.push(e.data);
         };
+
         recorder.onstop = async () => {
-          if (state.audioStream) {
-            state.audioStream.getTracks().forEach(t => t.stop());
-            state.audioStream = null;
-          }
-          const blob = new Blob(state.audioChunks, { type: "audio/webm" });
-          micStatus.textContent = "جاري إرسال الصوت إلى /api/voice/stt (إن وُجد في الباك إند)...";
           try {
+            if (state.audioStream) {
+              state.audioStream.getTracks().forEach(t => t.stop());
+              state.audioStream = null;
+            }
+            const blob = new Blob(state.audioChunks, { type: "audio/webm" });
+            micStatus.textContent = "جاري إرسال الصوت إلى /api/voice/stt ...";
             const url = getApiUrl("/api/voice/stt");
             const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
             const form = new FormData();
             form.append("file", blob, "voice.webm");
             form.append("fingerprint", fp);
+
             const res = await fetch(url, { method: "POST", headers: withAdmin(), body: form });
             if (!res.ok) throw new Error("HTTP " + res.status);
             const data = await res.json();
             const text = data.text || JSON.stringify(data);
             appendMessage("ai", "رد STT: " + text);
-            micStatus.textContent = "تم إرسال الصوت واستلام الرد من الباك إند (placeholder).";
+            micStatus.textContent = "تم إرسال الصوت واستلام الرد من الباك إند.";
           } catch (err) {
-            micStatus.textContent = "انتهى التسجيل، لكن لم يتم استدعاء /api/voice/stt: " + err.message;
+            micStatus.textContent = "انتهى التسجيل، لكن حصل خطأ أثناء الإرسال: " + err.message;
           }
         };
+
         recorder.start();
         state.isRecording = true;
         micBtn.textContent = "⏹️ إيقاف التسجيل";
@@ -587,7 +623,7 @@
       if (!state.isRecording) startRecording(); else stopRecording();
     });
 
-    // MEMORY
+    // ===== MEMORY =====
     const memKeyInput = document.getElementById("memKeyInput");
     const memValueInput = document.getElementById("memValueInput");
     const saveMemBtn = document.getElementById("saveMemBtn");
@@ -599,6 +635,7 @@
       let valueRaw = memValueInput.value.trim();
       const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
       if (!key) { alert("أدخل key أولاً."); return; }
+      if (!ensureApiBase()) { alert("اضبط رابط الـ API أولاً."); return; }
       let value;
       if (!valueRaw) value = "";
       else {
@@ -626,6 +663,10 @@
 
     async function loadMemories() {
       const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
+      if (!ensureApiBase()) {
+        memList.innerHTML = "<div class='hint'>اضبط رابط الـ API أولاً.</div>";
+        return;
+      }
       memList.innerHTML = "<div class='hint'>جارٍ تحميل الذكريات...</div>";
       try {
         const url = getApiUrl("/api/memory/list?fingerprint=" + encodeURIComponent(fp));
@@ -659,7 +700,7 @@
 
     refreshMemBtn.addEventListener("click", loadMemories);
 
-    // BUILDER
+    // ===== BUILDER =====
     const projNameInput = document.getElementById("projNameInput");
     const projTypeInput = document.getElementById("projTypeInput");
     const projSpecInput = document.getElementById("projSpecInput");
@@ -681,6 +722,7 @@
       const spec = projSpecInput.value.trim();
       const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
       if (!name) { alert("أدخل اسم المشروع."); return; }
+      if (!ensureApiBase()) { alert("اضبط رابط الـ API أولاً."); return; }
       buildProjBtn.disabled = true;
       logBuilder("بدء بناء المشروع: " + name + " ...");
       try {
@@ -698,7 +740,10 @@
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
         const rel = data.download_url || ("/api/builder/download/" + encodeURIComponent(name) + ".zip");
-        const full = getApiUrl(rel.replace(/^https?:\/\/[^/]+/, ""));
+        // لو رجع رابط كامل، نزيل الدومين ونركبه على apiBase
+        const full = rel.startsWith("http")
+          ? getApiUrl(rel.replace(/^https?:\/\/[^/]+/, ""))
+          : getApiUrl(rel);
         downloadLink.href = full;
         downloadLink.style.display = "inline-flex";
         logBuilder("تم بناء الحزمة. جاهزة للتحميل.");
@@ -709,7 +754,7 @@
       }
     });
 
-    // FILES & CAMERA
+    // ===== FILES & CAMERA =====
     const cameraPreview = document.getElementById("cameraPreview");
     const frontCamBtn = document.getElementById("frontCamBtn");
     const backCamBtn = document.getElementById("backCamBtn");
@@ -717,6 +762,14 @@
     const engFilesInput = document.getElementById("engFilesInput");
     const uploadEngBtn = document.getElementById("uploadEngBtn");
     const filesLog = document.getElementById("filesLog");
+
+    function logFiles(msg) {
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement("div");
+      line.textContent = "[" + time + "] " + msg;
+      filesLog.appendChild(line);
+      filesLog.scrollTop = filesLog.scrollHeight;
+    }
 
     async function startCamera(useBack) {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -732,10 +785,10 @@
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         state.videoStream = stream;
         cameraPreview.srcObject = stream;
-        cameraPreview.play();
-        filesLog.textContent = "الكاميرا تعمل (" + (useBack ? "خلفية" : "أمامية") + ").";
+        await cameraPreview.play();
+        logFiles("الكاميرا تعمل (" + (useBack ? "خلفية" : "أمامية") + ").");
       } catch (err) {
-        filesLog.textContent = "فشل تشغيل الكاميرا: " + err.message;
+        logFiles("فشل تشغيل الكاميرا: " + err.message);
       }
     }
 
@@ -744,7 +797,11 @@
 
     captureBtn.addEventListener("click", async () => {
       if (!state.videoStream || !cameraPreview.videoWidth) {
-        filesLog.textContent = "شغّل الكاميرا أولاً ثم التقط صورة.";
+        logFiles("شغّل الكاميرا أولاً ثم التقط صورة.");
+        return;
+      }
+      if (!ensureApiBase()) {
+        logFiles("اضبط رابط الـ API أولاً قبل إرسال الصورة.");
         return;
       }
       const canvas = document.createElement("canvas");
@@ -754,7 +811,7 @@
       ctx.drawImage(cameraPreview, 0, 0);
       canvas.toBlob(async (blob) => {
         if (!blob) return;
-        filesLog.textContent = "تم التقاط صورة. محاولة إرسالها إلى /api/vision/ocr ...";
+        logFiles("تم التقاط صورة. محاولة إرسالها إلى /api/vision/ocr ...");
         try {
           const url = getApiUrl("/api/vision/ocr");
           const form = new FormData();
@@ -763,24 +820,17 @@
           if (!res.ok) throw new Error("HTTP " + res.status);
           const data = await res.json();
           const text = data.text || JSON.stringify(data);
-          filesLog.textContent = "رد /api/vision/ocr: " + text.substring(0, 200);
+          logFiles("رد /api/vision/ocr: " + text.substring(0, 200));
         } catch (err) {
-          filesLog.textContent = "لم يتم إرسال الصورة (ربما المسار غير جاهز في الباك إند): " + err.message;
+          logFiles("لم يتم إرسال الصورة (ربما المسار غير مفعّل بعد في الباك إند): " + err.message);
         }
       }, "image/png");
     });
 
-    function logFiles(msg) {
-      const time = new Date().toLocaleTimeString();
-      const line = document.createElement("div");
-      line.textContent = "[" + time + "] " + msg;
-      filesLog.appendChild(line);
-      filesLog.scrollTop = filesLog.scrollHeight;
-    }
-
     uploadEngBtn.addEventListener("click", async () => {
       const files = engFilesInput.files;
       if (!files || files.length === 0) { alert("اختر ملفات أولاً."); return; }
+      if (!ensureApiBase()) { alert("اضبط رابط الـ API أولاً."); return; }
       const fp = fingerprintInput.value.trim() || "nasser_profile_v1";
       const form = new FormData();
       for (let i = 0; i < files.length; i++) form.append("files", files[i]);
@@ -799,6 +849,14 @@
       } finally {
         uploadEngBtn.disabled = false;
       }
+    });
+
+    // تنظيف الستريمات عند إغلاق الصفحة
+    window.addEventListener("beforeunload", () => {
+      try {
+        if (state.audioStream) state.audioStream.getTracks().forEach(t => t.stop());
+        if (state.videoStream) state.videoStream.getTracks().forEach(t => t.stop());
+      } catch (e) {}
     });
   </script>
 </body>
